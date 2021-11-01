@@ -5,9 +5,24 @@ Java.perform(function () {
      */
     const CallServerInterceptor = Java.use("com.kv5"); // okhttp3.internal.http.CallServerInterceptor
     const RealInterceptorChain = Java.use("com.pv5"); // okhttp3.internal.http.RealInterceptorChain
+    const Buffer = Java.use("okio.Buffer");
 
     function interceptRequest(request) {
-        send("[>] request intercepted:\n" + request.toString() + "\n\n");
+        // request == com.xt5
+        let requestUrl = request._b.value.toString();
+        send("[>] request intercepted: " + requestUrl);
+
+        let requestBody = request.e.value;
+        if (requestBody != null) {
+            let buffer = Buffer.$new();
+            // okhttp3.RequestBody::writeTo(sink: BufferedSink)
+            requestBody.c(buffer);
+
+            // Buffer::readUtf8(): String
+            let requestBodyStr = buffer.n();
+            send(" > body: " + requestBodyStr);
+        }
+        send("\n\n");
     }
 
     function interceptResponse(response) {
