@@ -20,9 +20,11 @@ Java.perform(function () {
 
             // Buffer::readUtf8(): String
             let requestBodyStr = buffer.n();
-            send(" > body: " + requestBodyStr);
+            if (requestBodyStr != "") {
+                send(" > body: " + requestBodyStr);
+            }
         }
-        send("\n\n");
+        send("\n");
     }
 
     function interceptResponse(response) {
@@ -31,13 +33,11 @@ Java.perform(function () {
         let responseBody = response.d(1024 * 128); // okhttp3.Response::peekBody(byteCount: Long)
         if (responseBody != null) {
             let responseBodyString = responseBody.f();
-            if (responseBodyString == "") {
-                send(" < empty response body");
-            } else {
-                send(" < body: " + responseBodyString.trim());
+            if (responseBodyString != "") {
+                send(" < body: " + responseBodyString);
             }
         }
-        send("\n\n");
+        send("\n");
     }
 
     BridgeInterceptor.intercept.implementation = function(chain) {
