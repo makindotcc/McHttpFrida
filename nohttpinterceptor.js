@@ -1,10 +1,10 @@
 Java.perform(function () {
     /** 
      * Like okhttp docs says:
-     * "This is the last interceptor in the chain. It makes a network call to the server."
+     * "Bridges from application code to network code."
+     * So this is a good place to place hehe some hook.
      */
-    const CallServerInterceptor = Java.use("com.kv5"); // okhttp3.internal.http.CallServerInterceptor
-    const RealInterceptorChain = Java.use("com.pv5"); // okhttp3.internal.http.RealInterceptorChain
+    const BridgeInterceptor = Java.use("com.jv5"); // okhttp3.internal.http.BridgeInterceptor
     const Buffer = Java.use("okio.Buffer");
 
     function interceptRequest(request) {
@@ -26,26 +26,27 @@ Java.perform(function () {
     }
 
     function interceptResponse(response) {
-        let responseBody = response.d(1024 * 128); // okhttp3.ResponseBody::peekBody(byteCount: Long)
-
         send("[<] response intercepted: " + JSON.stringify(response.toString()));
+
+        let responseBody = response.d(1024 * 128); // okhttp3.Response::peekBody(byteCount: Long)
         if (responseBody != null) {
             let responseBodyString = responseBody.f();
             if (responseBodyString == "") {
-                send("    empty response body");
+                send(" < empty response body");
             } else {
-                send(" body: " + responseBodyString.trim());
+                send(" < body: " + responseBodyString.trim());
             }
-            send("\n\n");
         }
+        send("\n\n");
     }
-    
-    CallServerInterceptor.intercept.implementation = function(chain) {
-        // f - obfuscated name of "request" field
-        let request = Java.cast(chain, RealInterceptorChain).f.value;
+
+    BridgeInterceptor.intercept.implementation = function(chain) {
+        // d - obfuscated name of "request" getter
+        let request = chain.d();
         interceptRequest(request);
 
         let response = this.intercept(chain);
+
         interceptResponse(response);
         return response;
     }
