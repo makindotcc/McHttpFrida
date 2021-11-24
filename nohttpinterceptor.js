@@ -1,4 +1,15 @@
 Java.perform(function () {
+    const showHeaders = true;
+
+    const Request = Java.use("com.xt5"); // okhttp3.Request
+    Request.getMethod = (r) => r.c.value;
+    Request.getUrl = (r) => r._b.value;
+    Request.getHeaders = (r) => r.d.value;
+    Request.getBody = (r) => r.e.value;
+
+    const Response = Java.use("com.bu5"); // okhttp3.Response
+    Response.getHeaders = (r) => r.t0.value;
+
     /** 
      * Like okhttp docs says:
      * "Bridges from application code to network code."
@@ -7,12 +18,20 @@ Java.perform(function () {
     const BridgeInterceptor = Java.use("com.jv5"); // okhttp3.internal.http.BridgeInterceptor
     const Buffer = Java.use("okio.Buffer");
 
-    function interceptRequest(request) {
-        // request == com.xt5
-        let requestUrl = request._b.value.toString();
-        send("[>] request intercepted: " + requestUrl);
+    function formatHeaders(headers) {
+        return headers.toString();
+    }
 
-        let requestBody = request.e.value;
+    function interceptRequest(request) {
+        let requestMethod = Request.getMethod(request);
+        let requestUrl = Request.getUrl(request).toString();
+        send(`[>] request intercepted: method=${requestMethod} url=${requestUrl}`);
+
+        if (showHeaders) {
+            send(" > headers:\n" + formatHeaders(Request.getHeaders(request)));
+        }
+
+        let requestBody = Request.getBody(request);
         if (requestBody != null) {
             let buffer = Buffer.$new();
             // okhttp3.RequestBody::writeTo(sink: BufferedSink)
@@ -29,6 +48,10 @@ Java.perform(function () {
 
     function interceptResponse(response) {
         send("[<] response intercepted: " + JSON.stringify(response.toString()));
+
+        if (showHeaders) {
+            send(" < headers:\n" + formatHeaders(Response.getHeaders(response)));
+        }
 
         let responseBody = response.d(1024 * 128); // okhttp3.Response::peekBody(byteCount: Long)
         if (responseBody != null) {
