@@ -1,21 +1,21 @@
 Java.perform(function () {
     const showHeaders = true;
 
-    const Request = Java.use("com.xt5"); // okhttp3.Request
+    const Request = Java.use("com.fz5"); // okhttp3.Request
     Request.getMethod = (r) => r.c.value;
     Request.getUrl = (r) => r._b.value;
     Request.getHeaders = (r) => r.d.value;
     Request.getBody = (r) => r.e.value;
 
-    const Response = Java.use("com.bu5"); // okhttp3.Response
-    Response.getHeaders = (r) => r.t0.value;
+    const Response = Java.use("com.jz5"); // okhttp3.Response
+    Response.getHeaders = (r) => r.B0.value;
 
     /** 
      * Like okhttp docs says:
      * "Bridges from application code to network code."
      * So this is a good place to place hehe some hook.
      */
-    const BridgeInterceptor = Java.use("com.jv5"); // okhttp3.internal.http.BridgeInterceptor
+    const BridgeInterceptor = Java.use("com.r06"); // okhttp3.internal.http.BridgeInterceptor
     const Buffer = Java.use("okio.Buffer");
 
     function formatHeaders(headers) {
